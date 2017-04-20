@@ -27,22 +27,24 @@ while True:
 		#print('2333')
 		connectionSocket,addr = serverSocket.accept()#获取连接socket
 		message = connectionSocket.recv(1024) #获得http报文
-		#print('message',message)
-		filename = message.split()[1]
-		#print('filename',filename)
+		print('message',message)
+		filename = message.split()[1] #获得URI，去掉首部'/'就是文件名
+		print('filename',filename)
 
-		f = open(filename[1:])
-		#print('f',type(f))
-		#print('**********')
+		f = open(filename[1:]) #打开文件
+		print('f:',f)
 		outputdata = f.readlines()#逐行读出文件内容并存到list中
+		print('outputdata-type',type(outputdata))
 		
 		#Send one HTTP header line into socket	
-		connectionSocket.send(b'HTTP/1.1 200 OK\r\n\r\n')
+		connectionSocket.send(b'HTTP/1.1 200 OK\r\n\r\n')#网络传输数据时是比特类型的
+
 		#Send the content of the requested file to the client
 		for i in range(0, len(outputdata)):
 			connectionSocket.send(bytes(outputdata[i],encoding='utf-8')	)
 		connectionSocket.close()
-	except IOError:
+	except IOError:  #当文件不存在时，程序并不能报错。
+
 		#Send response message for file not found
 		connectionSocket.send(b'404 not found')
 		#Close client socket
